@@ -21,14 +21,14 @@ class Classifier(torch.nn.Module):
 
 
         # delete origin FC and add custom FC
-        self.features = torchvision.models.resnet18(pretrained=True)  # True
+        self.features = torchvision.models.resnet50(pretrained=True)  # True
         del self.features.fc
         # print('feature extractor:\n', self.features)
 
         self.features = torch.nn.Sequential(
             *list(self.features.children()))
 
-        self.fc = torch.nn.Linear(512 ** 2, num_cls)  # output channels
+        self.fc = torch.nn.Linear(2048 ** 2, num_cls)  # output channels
         # print('=> fc layer:\n', self.fc)
 
 
@@ -46,16 +46,15 @@ class Classifier(torch.nn.Module):
         # print('X.size: ', X.size())
         # assert X.size() == (N, 512, 1, 1)
 
-        X = X.view(N, 512, 1 ** 2)
-        X = torch.bmm(X, torch.transpose(X, 1, 2)) / (1 ** 2)  # Bi-linear CNN for fine-grained classification
+        X = X.view(N, 2048, 1)
+        X = torch.bmm(X, torch.transpose(X, 1, 2))  # 特征自卷集，扩充特征的维度
 
         # assert X.size() == (N, 512, 512)
 
-        X = X.view(N, 512 ** 2)
+        X = X.view(N, 2048 ** 2)
         X = torch.sqrt(X + 1e-5)
         X = torch.nn.functional.normalize(X)
         X = self.fc(X)
-
         return X
 
 def get_predict(output):
