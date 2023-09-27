@@ -60,7 +60,7 @@ class SimameseDataset(Dataset):
         self.imgs=[]
         if isinstance(txt,list):
             for item in txt:
-                fh = open(item, 'r')#打开标签文件
+                fh = open(item, 'r',encoding='UTF-8')#打开标签文件
                 for line in fh:#遍历标签文件每行
                     line = line.rstrip()#删除字符串末尾的换行符
                     index_pic=find_suffix(line)
@@ -86,7 +86,11 @@ class SimameseDataset(Dataset):
     def __getitem__(self, index):#检索函数
         fn, label = self.imgs[index]#读取文件名、标签
         label = np.array(label)
-
+        # if label ==0:
+        #     label=1.0
+        # else:
+        #     label=-1.0
+        label = np.array(label).astype(np.float32)
         img = cv2.imread(fn)
         W = int(img.shape[1]/2)
         img1 = img[:,0:W,:]

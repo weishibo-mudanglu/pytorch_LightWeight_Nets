@@ -2,7 +2,7 @@
 import torch
 import torchvision
 
-class Classifier(torch.nn.Module):
+class Resnet18(torch.nn.Module):
     """
     vehicle multilabel-classifier
     """
